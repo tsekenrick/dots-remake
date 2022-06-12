@@ -5,8 +5,8 @@ using UnityEngine;
 public class Dot : MonoBehaviour
 {
     private Board board = Board.instance;
-    public SpriteRenderer sr;
-    public SpriteRenderer selectSr;
+    private SpriteRenderer sr;
+    private SpriteRenderer selectSr;
 
     public static readonly Color[] Palette = {
       new Color(.55f, .75f, 1), new Color(.9f, .86f, .13f), new Color(.94f, .36f, .26f), new Color(.55f, .92f, .58f), new Color(.61f, .36f, .71f)
@@ -21,13 +21,20 @@ public class Dot : MonoBehaviour
         sr = this.GetComponent<SpriteRenderer>();
         sr.color = dotColor;
         selectSr = transform.GetChild(0).GetComponent<SpriteRenderer>();
- 
-        // TODO - consider a coroutine that sets .simulated = false x seconds after instantiating a dot, then set
-        // column of dots back to .simulated = true whenever FillColumn is called
     }
 
     void Update()
     {
+      if(board.selected.Contains(this)) 
+      {
+        selectSr.enabled = true;
+      }
+      else 
+      {
+        selectSr.enabled = false;
+      }
+
+      // TODO - maybe set rigidbody .simulated to false once dots aren't in motion?
 
     }
 
@@ -37,17 +44,22 @@ public class Dot : MonoBehaviour
       if(board.selected.Count == 0) {
         board.selected.Add(this);
         board.selectedColor = dotColor;
-
         // TODO - better selected state
-        selectSr.enabled = true;
+        // selectSr.enabled = true;
       }
+      
       // check adjacency and colour match, add to selected if passing
-      // TODO - deselection logic
       else if(!board.selected.Contains(this) && dotColor == board.selectedColor
         && CheckAdjacency(board.selected[board.selected.Count - 1]))
       {
-        selectSr.enabled = true;
+        // selectSr.enabled = true;
         board.selected.Add(this);
+      }
+
+      // deselection - if you enter the collider of the penultimate dot
+      // in selection, remove the most recently selected dot
+      else if(board.selected.Count > 1 && board.selected.IndexOf(this) == board.selected.Count - 2) {
+        board.selected.Remove(board.selected[board.selected.Count - 1]);
       }
     }
 

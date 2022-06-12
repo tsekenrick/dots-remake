@@ -19,10 +19,7 @@ public class Board : MonoBehaviour
     void Awake()
     {
       instance = this; // allow other classes to easily reference singleton Board instance
-    }
-
-    void Start()
-    {
+    
       // instantiate Spawner for each column of the board
       for(int i = 0; i < ColumnCount; i++) 
       {
@@ -32,12 +29,17 @@ public class Board : MonoBehaviour
       spawners = GameObject.FindObjectsOfType<Spawner>();
     }
 
+    void Start()
+    {
+      
+    }
+
     void Update()
     {
       if(Input.GetKeyDown(KeyCode.R)) {
         SceneManager.LoadScene(0);
       }
-      
+
       if(Input.GetMouseButton(0))
       {
         isSelecting = true;
@@ -47,8 +49,29 @@ public class Board : MonoBehaviour
         isSelecting = false;
       }
 
-      if(Input.GetMouseButtonUp(0) && selected.Count != 0) {
+      // selection complete
+      if(Input.GetMouseButtonUp(0) && selected.Count > 0) 
+      {
+        // square case
+        if(selected.Count == 4 && DetectSquare(selected))
+        {
+          foreach(Spawner s in spawners)
+          {
+            s.column.RemoveList(s.column.GetAllDotsOfColor(selectedColor));
+          }
 
+        }
+
+        // base case
+        else if(selected.Count > 1)
+        {
+
+          foreach(Dot d in selected)
+          {
+            spawners[d.colIdx].column.Remove(d);
+          }
+        }
+        selected.Clear();
       }
     }
 

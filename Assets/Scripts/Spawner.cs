@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -32,6 +33,24 @@ public class Spawner : MonoBehaviour
         this.FillColumn();
       }
 
+      public void Remove(Dot toDestroy)
+      {
+        base.Remove(toDestroy as T);
+        Debug.Log($"count of colunn {this.columnIdx} is {this.Count}");
+        GameObject.Destroy(toDestroy.gameObject);
+        this.FillColumn();
+      }
+
+      public void RemoveList(List<Dot> toRemove)
+      {
+        foreach(Dot d in toRemove)
+        {
+          GameObject.Destroy(d.gameObject);
+          base.Remove(d as T);
+        }
+        this.FillColumn();
+      }
+
       public void FillColumn() 
       {
         int dotsToSpawn = Board.ColumnCount - this.Count;
@@ -45,10 +64,16 @@ public class Spawner : MonoBehaviour
           base.Add(curDot as T);
         }
       }
+
+      public List<Dot> GetAllDotsOfColor(Color target)
+      {
+        return this.Where(dot => dot.dotColor == target) as List<Dot>;
+      }
     }
 
     void Start()
     {
+      Debug.Log($"spawner {columnIdx} at {this.transform.position.x} assigning column");
       column = new Column<Dot>(dotPrefab, this.transform.position, columnIdx);
       column.FillColumn();
     }
