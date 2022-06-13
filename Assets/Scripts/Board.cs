@@ -9,13 +9,16 @@ public class Board : MonoBehaviour
 
     public static Board instance;
     public const int ColumnCount = 6;
-
+    public static readonly Color[] Palette = {
+      new Color(.55f, .75f, 1), new Color(.9f, .86f, .13f), new Color(.94f, .36f, .26f), new Color(.55f, .92f, .58f), new Color(.61f, .36f, .71f)
+    };
     public GameObject spawner;
     public Spawner[] spawners;
 
     public bool isSelecting;
     public List<Dot> selected = new List<Dot>();
     public Color selectedColor;
+    public bool squareSelection = false;
     
     void Awake()
     {
@@ -48,21 +51,33 @@ public class Board : MonoBehaviour
         isSelecting = false;
       }
 
-      // selection complete
+      // user finished selection
       if(Input.GetMouseButtonUp(0) && selected.Count > 0) 
       {
-        if(selected.Count > 1)
-        {
-          List<Spawner> colsToFill = new List<Spawner>();
-          foreach(Dot d in selected)
-          {
-            spawners[d.colIdx].column.Remove(d);
-            if(!colsToFill.Contains(spawners[d.colIdx])) colsToFill.Add(spawners[d.colIdx]);
-          }
+        ExecuteSelection(squareSelection);
+      }
+    }
 
-          foreach(Spawner s in colsToFill) s.column.FillColumn();
+    private void ExecuteSelection(bool isSquare)
+    {
+      if(isSquare) Dot.Palette.Remove(selectedColor);
+
+      if(selected.Count > 1)
+      {
+        List<Spawner> colsToFill = new List<Spawner>();
+        foreach(Dot d in selected)
+        {
+          spawners[d.colIdx].column.Remove(d);
+          if(!colsToFill.Contains(spawners[d.colIdx])) colsToFill.Add(spawners[d.colIdx]);
         }
-        selected.Clear();
+
+        foreach(Spawner s in colsToFill) s.column.FillColumn();
+      }
+      selected.Clear();
+
+      if(isSquare) {
+        Dot.Palette.Add(selectedColor);
+        squareSelection = false;
       }
     }
 }

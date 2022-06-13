@@ -9,7 +9,7 @@ public class Dot : MonoBehaviour
     private SpriteRenderer sr;
     private SpriteRenderer selectSr;
 
-    public static readonly Color[] Palette = {
+    public static readonly List<Color> Palette = new List<Color> {
       new Color(.55f, .75f, 1), new Color(.9f, .86f, .13f), new Color(.94f, .36f, .26f), new Color(.55f, .92f, .58f), new Color(.61f, .36f, .71f)
     };
     public Color dotColor;
@@ -18,10 +18,11 @@ public class Dot : MonoBehaviour
 
     void Start()
     {
-        dotColor = Palette[Random.Range(0, Palette.Length)];
+        dotColor = Palette[Random.Range(0, Palette.Count)];
         sr = this.GetComponent<SpriteRenderer>();
         sr.color = dotColor;
         selectSr = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        selectSr.color = new Color(dotColor.r, dotColor.g, dotColor.b, 0.5f);
     }
 
     void Update()
@@ -61,6 +62,7 @@ public class Dot : MonoBehaviour
       // is fulfilled, and add all relevant dots if so
       if(board.selected.Count == 4 && DetectSquare(board.selected))
       {
+        board.squareSelection = true;
         board.selected.Clear();
         foreach(Spawner s in board.spawners)
         {
