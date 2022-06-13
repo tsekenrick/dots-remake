@@ -60,6 +60,8 @@ public class Board : MonoBehaviour
 
     private void ExecuteSelection(bool isSquare)
     {
+      // for square selections, spawned dots should 
+      // not be of the previous selection's color
       if(isSquare) Dot.Palette.Remove(selectedColor);
 
       if(selected.Count > 1)
@@ -73,6 +75,7 @@ public class Board : MonoBehaviour
 
         foreach(Spawner s in colsToFill) s.column.FillColumn();
       }
+      selected.Last().lr.enabled = false;
       selected.Clear();
 
       if(isSquare) {
