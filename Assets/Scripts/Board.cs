@@ -8,25 +8,30 @@ public class Board : MonoBehaviour
 {
 
     public static Board instance;
-    public GameObject spawner;
     public const int ColumnCount = 6;
-    public Spawner[] spawners;
-    public bool isSelecting;
 
+    public GameObject spawner;
+    public Spawner[] spawners;
+
+    public bool isSelecting;
     public List<Dot> selected = new List<Dot>();
     public Color selectedColor;
     
     void Awake()
     {
       instance = this; // allow other classes to easily reference singleton Board instance
-    
+      
       // instantiate Spawner for each column of the board
+      spawners = new Spawner[ColumnCount];
       for(int i = 0; i < ColumnCount; i++) 
       {
-        GameObject go = Instantiate(spawner, new Vector3(1 + (i*2f), 28f, 0), Quaternion.identity);
-        go.GetComponent<Spawner>().columnIdx = i;
+        GameObject go = Instantiate(spawner, new Vector3(1 + (i*2f), 20f, 0), Quaternion.identity);
+        Spawner s = go.GetComponent<Spawner>();
+        s.columnIdx = i;
+        spawners[i] = s;
       }
-      spawners = GameObject.FindObjectsOfType<Spawner>();
+      
+      // spawners = GameObject.FindObjectsOfType<Spawner>().Reverse<Spawner>().ToArray();
     }
 
     void Start()

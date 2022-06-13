@@ -14,6 +14,7 @@ public class Dot : MonoBehaviour
     public Color dotColor;
     public int dotIdx;
     public int colIdx;
+    public string dotId; // TODO - remove, for debugging
 
     void Start()
     {
@@ -44,15 +45,12 @@ public class Dot : MonoBehaviour
       if(board.selected.Count == 0) {
         board.selected.Add(this);
         board.selectedColor = dotColor;
-        // TODO - better selected state
-        // selectSr.enabled = true;
       }
       
       // check adjacency and colour match, add to selected if passing
       else if(!board.selected.Contains(this) && dotColor == board.selectedColor
         && CheckAdjacency(board.selected[board.selected.Count - 1]))
       {
-        // selectSr.enabled = true;
         board.selected.Add(this);
       }
 
@@ -79,14 +77,5 @@ public class Dot : MonoBehaviour
         (this.colIdx == refDot.colIdx + 1 || this.colIdx == refDot.colIdx - 1);
       
       return (columnAdj || rowAdj);
-    }
-
-    void OnCollisionEnter2D(Collision2D coll)
-    {
-      
-    }
-
-    void OnCollisionExit2D()
-    {
     }
 }
