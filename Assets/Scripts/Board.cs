@@ -25,23 +25,17 @@ public class Board : MonoBehaviour
       spawners = new Spawner[ColumnCount];
       for(int i = 0; i < ColumnCount; i++) 
       {
-        GameObject go = Instantiate(spawner, new Vector3(1 + (i*2f), 20f, 0), Quaternion.identity);
+        GameObject go = Instantiate(spawner, new Vector3(1 + (i*2f), 28f, 0), Quaternion.identity);
         Spawner s = go.GetComponent<Spawner>();
         s.columnIdx = i;
         spawners[i] = s;
       }
-      
-      // spawners = GameObject.FindObjectsOfType<Spawner>().Reverse<Spawner>().ToArray();
-    }
-
-    void Start()
-    {
-      
     }
 
     void Update()
     {
-      if(Input.GetKeyDown(KeyCode.R)) {
+      if(Input.GetKeyDown(KeyCode.R)) 
+      {
         SceneManager.LoadScene(0);
       }
 
@@ -57,41 +51,18 @@ public class Board : MonoBehaviour
       // selection complete
       if(Input.GetMouseButtonUp(0) && selected.Count > 0) 
       {
-        // square case
-        if(selected.Count == 4 && DetectSquare(selected))
+        if(selected.Count > 1)
         {
-          foreach(Spawner s in spawners)
-          {
-            s.column.RemoveList(s.column.GetAllDotsOfColor(selectedColor));
-          }
-
-        }
-
-        // base case
-        else if(selected.Count > 1)
-        {
-
+          List<Spawner> colsToFill = new List<Spawner>();
           foreach(Dot d in selected)
           {
             spawners[d.colIdx].column.Remove(d);
+            if(!colsToFill.Contains(spawners[d.colIdx])) colsToFill.Add(spawners[d.colIdx]);
           }
+
+          foreach(Spawner s in colsToFill) s.column.FillColumn();
         }
         selected.Clear();
       }
-    }
-
-    // if diff in colIdx and dotIdx is no more than 1 for
-    // all dots in selection, selection is a square
-    private bool DetectSquare(List<Dot> selection)
-    {
-      if(selection.Count != 4) return false;
-      
-      int minRow = selection.Min(dot => dot.dotIdx);
-      int maxRow = selection.Max(dot => dot.dotIdx);
-
-      int minCol = selection.Min(dot => dot.colIdx);
-      int maxCol = selection.Max(dot => dot.colIdx);
-      
-      return (maxRow - minRow == 1 && maxCol - minCol == 1);
     }
 }

@@ -37,7 +37,6 @@ public class Spawner : MonoBehaviour
       {
         base.Remove(toDestroy as T);
         GameObject.Destroy(toDestroy.gameObject);
-        this.FillColumn();
       }
 
       public void RemoveList(List<Dot> toRemove)
@@ -52,11 +51,7 @@ public class Spawner : MonoBehaviour
 
       public void UpdateDotIndices()
       {
-        foreach(Dot d in this)
-        {
-          d.dotIdx = this.IndexOf(d as T);
-          d.dotId = $"{d.colIdx} - {d.dotIdx}";
-        }
+        foreach(Dot d in this) d.dotIdx = this.IndexOf(d as T);
       }
 
       public void FillColumn() 
@@ -65,7 +60,7 @@ public class Spawner : MonoBehaviour
         for(int i = dotsToSpawn; i > 0; i--)
         {
           // spawns dots at a fixed height apart
-          GameObject go = Instantiate(toSpawn, new Vector3(spawnPos.x, spawnPos.y + (2.5f*i), spawnPos.z), Quaternion.identity);
+          GameObject go = Instantiate(toSpawn, new Vector3(spawnPos.x, spawnPos.y - (2.5f*i), spawnPos.z), Quaternion.identity);
           Dot curDot = go.GetComponent<Dot>();
           curDot.dotIdx = this.Count;
           curDot.colIdx = this.columnIdx;
@@ -76,7 +71,7 @@ public class Spawner : MonoBehaviour
 
       public List<Dot> GetAllDotsOfColor(Color target)
       {
-        return this.Where(dot => dot.dotColor == target) as List<Dot>;
+        return this.Where(dot => dot.dotColor == target).ToList() as List<Dot>;
       }
     }
 
@@ -84,10 +79,5 @@ public class Spawner : MonoBehaviour
     {
       column = new Column<Dot>(dotPrefab, this.transform.position, columnIdx);
       column.FillColumn();
-    }
-
-    void Update()
-    {
-
     }
 }

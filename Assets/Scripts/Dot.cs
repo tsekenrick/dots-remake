@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Dot : MonoBehaviour
@@ -14,7 +15,6 @@ public class Dot : MonoBehaviour
     public Color dotColor;
     public int dotIdx;
     public int colIdx;
-    public string dotId; // TODO - remove, for debugging
 
     void Start()
     {
@@ -34,9 +34,6 @@ public class Dot : MonoBehaviour
       {
         selectSr.enabled = false;
       }
-
-      // TODO - maybe set rigidbody .simulated to false once dots aren't in motion?
-
     }
 
     void OnMouseDown() 
@@ -59,6 +56,17 @@ public class Dot : MonoBehaviour
       else if(board.selected.Count > 1 && board.selected.IndexOf(this) == board.selected.Count - 2) {
         board.selected.Remove(board.selected[board.selected.Count - 1]);
       }
+
+      // after adding/removing, check if square condition 
+      // is fulfilled, and add all relevant dots if so
+      if(board.selected.Count == 4 && DetectSquare(board.selected))
+      {
+        board.selected.Clear();
+        foreach(Spawner s in board.spawners)
+        {
+          board.selected.AddRange(s.column.GetAllDotsOfColor(board.selectedColor));
+        }
+      }
     }
 
     void OnMouseEnter() 
@@ -77,5 +85,20 @@ public class Dot : MonoBehaviour
         (this.colIdx == refDot.colIdx + 1 || this.colIdx == refDot.colIdx - 1);
       
       return (columnAdj || rowAdj);
+    }
+
+    // if diff in colIdx and dotIdx is no more than 1 for
+    // all dots in selection, selection is a square
+    private bool DetectSquare(List<Dot> selection)
+    {
+      if(selection.Count != 4) return false;
+      
+      int minRow = selection.Min(dot => dot.dotIdx);
+      int maxRow = selection.Max(dot => dot.dotIdx);
+
+      int minCol = selection.Min(dot => dot.colIdx);
+      int maxCol = selection.Max(dot => dot.colIdx);
+      
+      return (maxRow - minRow == 1 && maxCol - minCol == 1);
     }
 }
